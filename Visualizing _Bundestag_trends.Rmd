@@ -1,0 +1,174 @@
+---
+title: "Visualizing Trends in the Bundestag"
+author: "Santiago Giordano" 
+output:
+  html_document: default
+  github_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache=TRUE)
+```
+
+
+```{r libs, message = FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(ggplot2, here, HLMdiag, readr, ggthemes, tidyr,
+               dplyr, RColorBrewer, patchwork, ggpol, magrittr)
+```
+
+
+### Data
+
+```{r Load data, message=FALSE}
+# Load Bundestag data
+bundestag_party_seats <- read_csv(here("Data/bundestag_party_seats_by_year copy.csv"))
+
+# Pivoted Bundestag data
+bundestag_election_seats <- read_csv(here("Data/bundestag copy.csv"))
+```
+
+|   The data used was compiled from Germany's Federal Returning Officer's website, [Der Bundeswhalleiter](https://www.bundeswahlleiter.de/en/bundeswahlleiter.html). Globally, the data has the seat count each party received in every election since 1949 up until the latest election as of June 2022. For the visualizations I use two datasets using the same data in slightly different formats. `bundestag_party_seats` is made up of an election year variable and one variable for each party which denotes the seat count in any given election. This dataset is a pivoted version of `bundestag_election_seats` which has one variable for party and one variable for each election year (it also includes some descriptive variables for the parties but these are not as relevant).
+
+
+
+## Visualizations
+
+
+### Party Seat Distribution in the Bundestag since 1949
+
+```{r Bundestag, message=FALSE, warning=FALSE}
+#bundestag_party_seats %<>% 
+ # mutate(greens_seats = ifelse(greens_seats == 0, NA, greens_seats)) %>% 
+  #mutate(afd_seats = ifelse(afd_seats == 0, NA, afd_seats)) %>% 
+  #mutate(other_seats = ifelse(other_seats == 0, NA, other_seats)) %>% 
+  #mutate(linke_pds_seats = ifelse(linke_pds_seats == 0, NA, linke_pds_seats))
+
+bundestag_2 <- gather(bundestag_party_seats[-c(1),], key = party, value = seats, 
+                      c("cdu_csu_seats", "spd_seats", "fdp_seats", "greens_seats", 
+                        "linke_pds_seats", "afd_seats", "other_seats")) 
+
+ggplot(bundestag_2, aes(x = year, y = seats, group = party, colour = party, shape = party)) + 
+  geom_line() +
+  geom_point() +
+   labs(title = "Historical Seat Distribution in the Bundestag", x = "Year", 
+       y = "Number of Seats", color = "Party", shape = "Party",
+       caption = "Source: https://www.bundeswahlleiter.de/en/bundeswahlleiter.html") +
+  #scale_color_discrete() +
+  scale_color_manual(breaks = c("cdu_csu_seats", "spd_seats", "fdp_seats", "greens_seats", 
+                        "afd_seats", "linke_pds_seats", "other_seats"),
+                     values=c('grey25', 'tomato3', 'gold2', 'springgreen4', 'skyblue1',
+                              'plum', 'grey50'),
+                     labels = c('CDU/CSU', 'SPD', 'FDP', 'Greens', 'Afd', 'Die Linke', 'Other')) +
+  scale_shape_manual(breaks = c("cdu_csu_seats", "spd_seats", "fdp_seats", "greens_seats", 
+                        "afd_seats", "linke_pds_seats", "other_seats"),
+                     values=c(21, 24, 3, 22, 25, 10, 8),
+                     labels = c('CDU/CSU', 'SPD', 'FDP', 'Greens', 'Afd', 'Die Linke', 'Other')) +
+  scale_x_discrete(breaks = c("1949", "1957", "1965", "1972", "1980", "1987", "1994", "2002", "2009", "2017")) +
+  theme_economist() +
+  theme(text = element_text('Avenir Next Condensed'),
+        plot.title = element_text(size = 18),
+        plot.caption = element_text(face = "italic", vjust = -2.5, hjust = 1.4, size = 9),
+        axis.title.y = element_text(vjust = 2.2),
+        axis.title.x = element_text(vjust = -1.8),
+        legend.position = "right",
+        legend.background = element_rect(color = 'black', linetype = 'solid'),
+        legend.box.background = element_rect(fill = "slategray2"),
+        legend.key.size = unit(.5, "cm"),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(
+          size = 9,
+          face = 'italic')
+        )
+```
+
+|   While this is not necessarily the fanciest line graph, it conveys quite well the general trends seen in the support for German parties. If we examine the trends chronologically, we can see the decline of the German right wing populist movement during the 50's: the number of CDU/CSU seats skyrockets, and this change seems to be primarily associated with the decrease in the seats of the 'Other' parties category (composed then of mostly of small right wing nationalist parties at the time). Until the 80s, the distribution in the Bundestag stays relatively stable. As the Greens and Die Linke (left-leaning and left parties) enter the parliament, the main center-left party SPD's seats don't seem to fall; in fact they rise, indicating a growth in support for left leaning politics (Perhaps an obvious development considering these changes took place after the German unification). After the 2000s, though, we see the Greens and Die Linke continue to grow progressively, eroding the SPD's share of seats. Additionally, we see the CDU/CSU retake its dominance (i.e., the Merkel years), but most significantly to German politics, and even European politics, we see the resurgence of right wing nationalist movements as AfD enters the Bundestag in 2017. Since the AfD gained seats in the national parliament, CDU/CSU seats have fallen, so we could infer that AfD benefited from taking some of CSU's voters. 
+
+
+### Composition of the Bundestag: Current vs Historical 
+
+```{r clean-for-ggpol}
+# A) Some cleaning for the graphs:
+  # Rename column
+bundestag_election_seats <- rename(bundestag_election_seats, "seats_2021" = "2021")
+  # Rearrange rows:
+bundestag_election_seats %<>% 
+  arrange(factor(Party, levels = c("Other", "Afd", "CDU/CSU", "FDP", "Grüne", "SPD", "Die Linke (PDS)")))
+```
+
+```{r ggpol-fig1}
+# B) Plot:
+  # b.1) Plot graph of Bundestag after 2021 election
+ggplot(bundestag_election_seats[-c(8:10),]) + 
+  geom_parliament(aes(seats = seats_2021, fill = Party), color = "black") +
+  labs(
+    title = "German Bundestag After 2021 Election",
+    caption = "Source: https://www.bundeswahlleiter.de/en/bundeswahlleiter.html") +
+  scale_fill_manual(name = "Party", 
+                    values = c("grey", "skyblue1", "grey25", "gold2",  
+                               "springgreen4", "tomato3","plum"), 
+                    labels = c("Other", "AfD", "CDU/CSU", "FDP", "Greens", "SPD", "Die Linke")) + 
+  theme_void() +
+  theme_economist() +
+  theme(
+    text = element_text('Avenir Next Condensed'),
+    plot.title = element_text(face = 'bold', size = 25),
+    #plot.margin = unit(c(1, 1, 1, 1), "cm"),
+    plot.subtitle = element_text(size = 15, vjust = -0.6),
+    legend.position = "right",
+    legend.key.size = unit(c(0.55), "cm"),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 8),
+    legend.box.background = element_rect(fill = "slategray2"), #lightsteelblue2 slategray2
+    legend.box.margin = margin(5,5,5,5),
+    plot.caption = element_text(face = 'italic', vjust = -0.5, size = 9, hjust = 1),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+```
+
+```{r ggpol-fig2}
+  # b.2) Plot graph of avg seat distribution in the Bundestag
+ggplot(bundestag_election_seats[-c(8:10),]) + 
+  geom_parliament(aes(seats = avg_seats, fill = Party), color = "black") +
+  labs(
+    title = "Average Seat Distribution in the Bundestag",
+    subtitle = "(Since 1949)",
+    caption = "Source: https://www.bundeswahlleiter.de/en/bundeswahlleiter.html") +
+  scale_fill_manual(name = "Party", 
+                    values = c("grey", "skyblue1", "grey25", "gold2",  
+                               "springgreen4", "tomato3","plum"), 
+                    labels = c("Other", "AfD", "CDU/CSU", "FDP", "Greens", "SPD", "Die Linke")) + #bundestag_election_seats$Party
+  theme_void() +
+  theme_economist() +
+  theme(
+    text = element_text('Avenir Next Condensed'),
+    plot.title = element_text(face = 'bold', size = 25),
+    #plot.margin = unit(c(1, 1, 1, 1), "cm"),
+    plot.subtitle = element_text(size = 15, vjust = -0.6),
+    legend.position = "right",
+    legend.key.size = unit(c(0.55), "cm"),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 8),
+    legend.box.background = element_rect(fill = "slategray2"), #lightsteelblue2 slategray2
+    legend.box.margin = margin(5,5,5,5),
+    plot.caption = element_text(face = 'italic', vjust = -0.5, size = 9, hjust = 1),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+```
+<p>
+|   The first graph shows the composition of the Bundestag after the 2021 election, and the second one, shows what the composition of the Bundestag looks like based on the average number of seats each party has had since the 1949. I think these graphs are not necessarily the most informative, since, for example, we cannot tell what the actual number of seats each party has, and we could use other simpler graphs to convey the information. However, I found this geom a little while ago and I personally think it looks really cool and wanted to show it. Moreover, by putting together the graph for the 2021 election and the seat averages, I think the viewer is able to get a general sense of which parties have dominated parliament and which parties have recently gained more support - specifically, we can see the CDU/CSU and SPD have dominated historically and other center as well as more radical parties have appeared in recent years. Ultimately, this is not the most sound graph, but I think it is visually appealing and I guess we don't always need to convey life changing insights in a graph. (I should add I am a bit of a politics geek so perhaps these graphs are not as interesting to others, but I digress)
+
+
+
+## Source
+
+Data retrieved from Germany's Federal Returning Officer's website - [Bundeswahlleiter](https://www.bundeswahlleiter.de/en/bundeswahlleiter.html). 
+
