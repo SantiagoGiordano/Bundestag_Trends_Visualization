@@ -1,74 +1,41 @@
 ---
 title: "Visualizing Trends in the Bundestag"
 format: html
-date: "`r format(Sys.time(), '%d %B %Y')`"
+Author: Santiago Giordano
 editor: visual
 ---
 
 ```{r setup, include=FALSE}
-## These next lines set the default behaviour for all R chunks in the .Rmd document.
-## I recomend you take a look here: https://rmarkdown.rstudio.com/authoring_rcodechunks.html
-knitr::opts_chunk$set(echo = TRUE) ## Show all R output
-knitr::opts_chunk$set(cache=TRUE) ## Cache the results to increase performance.
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache=TRUE)
 ```
-
 
 
 ```{r libs, message = FALSE}
 if (!require("pacman")) install.packages("pacman")
-## Note: The `p_load()` function from the pacman package is a convenient way to 
-## install (if necessary) and load packages all at once. You can think of this
-## as an alternative to the normal `library(ggplot2); library(here);...` way of
-## loading R packages.
-pacman::p_load(ggplot2, here, HLMdiag, Ecdat, readr, ggthemes, tidyr, 
-               hrbrthemes, dplyr, skimr, RColorBrewer, patchwork, ggpol, magrittr)
-#p_load()
+pacman::p_load(ggplot2, here, HLMdiag, readr, ggthemes, tidyr,
+               dplyr, RColorBrewer, patchwork, ggpol, magrittr)
 ```
 
 
-## A) Data:
+### Data
 
 ```{r Load data, message=FALSE}
-# Load `ggplot2` built in Diamonds dataset
-diamonds <- diamonds
-
 # Load Bundestag data
-bundestag_party_seats <- read_csv(here("data/bundestag_party_seats_by_year.csv"))
-  # Pivotted Bundestag data
-bundestag_election_seats <- read_csv(here("data/bundestag.csv"))
+bundestag_party_seats <- read_csv(here("Data/bundestag_party_seats_by_year copy.csv"))
 
-#jfk2020 <- read_csv(here("data/jfk flights 2020.csv"))
+# Pivoted Bundestag data
+bundestag_election_seats <- read_csv(here("Data/bundestag copy.csv"))
 ```
 
-I will be using two sets of data. The first the `diamonds` data set, from the `ggplot2` package; its variables denote different characteristics of individual diamonds, such as the carat, the size, the depth, the condition and the price of diamonds. The most evident analysis that we can do with this data is looking at how these different characteristics affect the price. The second data set I uploaded myself, and it gives the seat distribution for each party in the German Bundestag after every parliamentary election since 1949. There is one variable for the election year, and then one for each party's seat count after that election year. As you can see above, for these data I actually have two data frames - I had to transpose the data on excel for one of the last visualizations, so its the same data just pivoted. 
+|   The data used was compiled from Germany's Federal Returning Officer's website, [Der Bundeswhalleiter](https://www.bundeswahlleiter.de/en/bundeswahlleiter.html). Globally, the data has the seat count each party received in every election since 1949 up until the latest election as of June 2022. For the visualizations I use two datasets using the same data in slightly different formats. `bundestag_party_seats` is made up of an election year variable and one variable for each party which denotes the seat count in any given election. This dataset is a pivoted version of `bundestag_election_seats` which has one variable for party and one variable for each election year (it also includes some descriptive variables for the parties but these are not as relevant).
 
 
-## Visualizations:
 
-### Figure 1: Diamond Prices 
-
-```{r fig2}
-# Plot diamond prices with carat, adding color for the dimaond cut
-ggplot(diamonds) +
-  geom_point(aes(x = carat, y = price, color = cut), alpha = 0.45) +
-  labs(title = "Variation in Diamond Prices", x = "Carat", y = "Price ($)", color = "Cut") +
-  theme_economist() + 
-  theme(text = element_text('Avenir Next Condensed'),
-        axis.title.y = element_text(vjust = 2.2),
-        plot.title = element_text(size = 18),
-        legend.position = "right",
-        legend.background = element_rect(color = 'black', linetype = 'solid'),
-        legend.text = element_text(
-          size = 10,
-          face = 'italic'
-        ))
-
-```
-
-- In the chart above, I plotted how diamond prices vary according to carat. We see a noticeable trend, where naturally the more carats the higher the price. Nevertheless, there seems to be a threshold after which all diamonds, regardless of carat, can be priced at the same amount. I also used color to indicate the quality of the cut of the diamond; unsurprisingly, we see that diamonds with poorer quality cuts are priced at lower ranges than diamonds of the same carat but of better cuts. 
+## Visualizations
 
 
-### Figure 2: Party Seat Distribution in the Bundestag 
+### Party Seat Distribution in the Bundestag since 1949
 
 ```{r Bundestag, message=FALSE, warning=FALSE}
 #bundestag_party_seats %<>% 
@@ -115,20 +82,21 @@ ggplot(bundestag_2, aes(x = year, y = seats, group = party, colour = party, shap
         )
 ```
 
-- While this is not necessarily the fanciest line graph, it conveys quite well the general trends seen in the support for German parties. If we examine the trends chronologically, we can see the decline of the German right wing populist movement during the 50's: the number of CDU/CSU seats skyrockets, and this change seems to be primarily associated with the decrease in the seats of the 'Other' parties category (composed then of mostly of small right wing nationalist parties at the time). Until the 80s, the distribution in the Bundestag stays relatively stable. As the Greens and Die Linke (left-leaning and left parties) enter the parliament, the main center-left party SPD's seats don't seem to fall; in fact they rise, indicating a growth in support for left leaning politics (Perhaps an obvious development considering these changes took place after the German unification). After the 2000s, though, we see the Greens and Die Linke continue to grow progressively, eroding the SPD's share of seats. Additionally, we see the CDU/CSU retake its dominance (i.e., the Merkel years), but most significantly to German politics, and even European politics, we see the resurgence of right wing nationalist movements as AfD enters the Bundestag in 2017. Since the AfD gained seats in the national parliament, CDU/CSU seats have fallen, so we could infer that AfD benefited from taking some of CSU's voters. 
+|   While this is not necessarily the fanciest line graph, it conveys quite well the general trends seen in the support for German parties. If we examine the trends chronologically, we can see the decline of the German right wing populist movement during the 50's: the number of CDU/CSU seats skyrockets, and this change seems to be primarily associated with the decrease in the seats of the 'Other' parties category (composed then of mostly of small right wing nationalist parties at the time). Until the 80s, the distribution in the Bundestag stays relatively stable. As the Greens and Die Linke (left-leaning and left parties) enter the parliament, the main center-left party SPD's seats don't seem to fall; in fact they rise, indicating a growth in support for left leaning politics (Perhaps an obvious development considering these changes took place after the German unification). After the 2000s, though, we see the Greens and Die Linke continue to grow progressively, eroding the SPD's share of seats. Additionally, we see the CDU/CSU retake its dominance (i.e., the Merkel years), but most significantly to German politics, and even European politics, we see the resurgence of right wing nationalist movements as AfD enters the Bundestag in 2017. Since the AfD gained seats in the national parliament, CDU/CSU seats have fallen, so we could infer that AfD benefited from taking some of CSU's voters. 
 
 
-### Figures 3.A and 3.B: Composition of the Bundestag
+### Composition of the Bundestag: Current vs Historical 
 
-```{r ggpol of Bundestag}
+```{r clean-for-ggpol}
 # A) Some cleaning for the graphs:
   # Rename column
 bundestag_election_seats <- rename(bundestag_election_seats, "seats_2021" = "2021")
   # Rearrange rows:
 bundestag_election_seats %<>% 
   arrange(factor(Party, levels = c("Other", "Afd", "CDU/CSU", "FDP", "Grüne", "SPD", "Die Linke (PDS)")))
+```
 
-
+```{r ggpol-fig1}
 # B) Plot:
   # b.1) Plot graph of Bundestag after 2021 election
 ggplot(bundestag_election_seats[-c(8:10),]) + 
@@ -159,7 +127,9 @@ ggplot(bundestag_election_seats[-c(8:10),]) +
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank()
   )
+```
 
+```{r ggpol-fig2}
   # b.2) Plot graph of avg seat distribution in the Bundestag
 ggplot(bundestag_election_seats[-c(8:10),]) + 
   geom_parliament(aes(seats = avg_seats, fill = Party), color = "black") +
@@ -193,5 +163,11 @@ ggplot(bundestag_election_seats[-c(8:10),]) +
 
 ```
 <p>
-- The first graph shows the composition of the Bundestag after the 2021 election, and the second one, shows what the composition of the Bundestag looks like based on the average number of seats each party has had since the 1949. I think these graphs are not necessarily the most informative, since, for example, we cannot tell what the actual number of seats each party has, and we could use other simpler graphs to convey the information. However, I found this geom a little while ago and I personally think it looks really cool and wanted to show it. Moreover, by putting together the graph for the 2021 election and the seat averages, I think the viewer is able to get a general sense of which parties have dominated parliament and which parties have recently gained more support - specifically, we can see the CDU/CSU and SPD have dominated historically and other center as well as more radical parties have appeared in recent years. Ultimately, this is not the most sound graph, but I think it is visually appealing and I guess we don't always need to convey life changing insights in a graph. (I should add I am a bit of a politics geek so perhaps these graphs are not as interesting to others, but I digress)
+|   The first graph shows the composition of the Bundestag after the 2021 election, and the second one, shows what the composition of the Bundestag looks like based on the average number of seats each party has had since the 1949. I think these graphs are not necessarily the most informative, since, for example, we cannot tell what the actual number of seats each party has, and we could use other simpler graphs to convey the information. However, I found this geom a little while ago and I personally think it looks really cool and wanted to show it. Moreover, by putting together the graph for the 2021 election and the seat averages, I think the viewer is able to get a general sense of which parties have dominated parliament and which parties have recently gained more support - specifically, we can see the CDU/CSU and SPD have dominated historically and other center as well as more radical parties have appeared in recent years. Ultimately, this is not the most sound graph, but I think it is visually appealing and I guess we don't always need to convey life changing insights in a graph. (I should add I am a bit of a politics geek so perhaps these graphs are not as interesting to others, but I digress)
+
+
+
+## Source
+
+Data retrieved from Germany's Federal Returning Officer's website - [Bundeswahlleiter](https://www.bundeswahlleiter.de/en/bundeswahlleiter.html). 
 

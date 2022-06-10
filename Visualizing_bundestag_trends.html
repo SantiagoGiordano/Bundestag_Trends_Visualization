@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="quarto-0.9.238">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Visualizing Trends in the Bundestag</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+
+  <script src="Visualizing_bundestag_trends_files/libs/clipboard/clipboard.min.js"></script>
+  <script src="Visualizing_bundestag_trends_files/libs/quarto-html/quarto.js"></script>
+  <script src="Visualizing_bundestag_trends_files/libs/quarto-html/popper.min.js"></script>
+  <script src="Visualizing_bundestag_trends_files/libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="Visualizing_bundestag_trends_files/libs/quarto-html/anchor.min.js"></script>
+  <link href="Visualizing_bundestag_trends_files/libs/quarto-html/tippy.css" rel="stylesheet">
+  <link id="quarto-text-highlighting-styles" href="Visualizing_bundestag_trends_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <script src="Visualizing_bundestag_trends_files/libs/bootstrap/bootstrap.min.js"></script>
+  <link href="Visualizing_bundestag_trends_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="Visualizing_bundestag_trends_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body class="fullcontent">
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  
+</div>
+
+<main class="content" id="quarto-document-content">
+<header id="title-block-header" class="quarto-title-block default">
+
+<div class="quarto-title"><h1 class="title display-7">Visualizing Trends in the Bundestag</h1></div></header>
+<div class="cell" data-hash="Visualizing_bundestag_trends_cache/html/libs_c461671723c518ada025a0b859107a18">
+
+</div>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">Data</h3>
+<div class="cell" data-hash="Visualizing_bundestag_trends_cache/html/Load data_dea742b7e584376d84a7d45fb26166fa">
+
+</div>
+<p>&nbsp;&nbsp;The data used was compiled from Germany’s Federal Returning Officer’s website, <a href="https://www.bundeswahlleiter.de/en/bundeswahlleiter.html">Der Bundeswhalleiter</a>. Globally, the data has the seat count each party received in every election since 1949 up until the latest election as of June 2022. For the visualizations I use two datasets using the same data in slightly different formats. <code>bundestag_party_seats</code> is made up of an election year variable and one variable for each party which denotes the seat count in any given election. This dataset is a pivoted version of <code>bundestag_election_seats</code> which has one variable for party and one variable for each election year (it also includes some descriptive variables for the parties but these are not as relevant).</p>
+</section>
+<section id="visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="visualizations">Visualizations</h2>
+<section id="party-seat-distribution-in-the-bundestag-since-1949" class="level3">
+<h3 class="anchored" data-anchor-id="party-seat-distribution-in-the-bundestag-since-1949">Party Seat Distribution in the Bundestag since 1949</h3>
+<div class="cell" data-hash="Visualizing_bundestag_trends_cache/html/Bundestag_fe157b19424e78851cf8269686512f7e">
+<div class="cell-output-display">
+<p><img src="Visualizing_bundestag_trends_files/figure-html/Bundestag-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>&nbsp;&nbsp;While this is not necessarily the fanciest line graph, it conveys quite well the general trends seen in the support for German parties. If we examine the trends chronologically, we can see the decline of the German right wing populist movement during the 50’s: the number of CDU/CSU seats skyrockets, and this change seems to be primarily associated with the decrease in the seats of the ‘Other’ parties category (composed then of mostly of small right wing nationalist parties at the time). Until the 80s, the distribution in the Bundestag stays relatively stable. As the Greens and Die Linke (left-leaning and left parties) enter the parliament, the main center-left party SPD’s seats don’t seem to fall; in fact they rise, indicating a growth in support for left leaning politics (Perhaps an obvious development considering these changes took place after the German unification). After the 2000s, though, we see the Greens and Die Linke continue to grow progressively, eroding the SPD’s share of seats. Additionally, we see the CDU/CSU retake its dominance (i.e., the Merkel years), but most significantly to German politics, and even European politics, we see the resurgence of right wing nationalist movements as AfD enters the Bundestag in 2017. Since the AfD gained seats in the national parliament, CDU/CSU seats have fallen, so we could infer that AfD benefited from taking some of CSU’s voters.</p>
+</section>
+<section id="composition-of-the-bundestag-current-vs-historical" class="level3">
+<h3 class="anchored" data-anchor-id="composition-of-the-bundestag-current-vs-historical">Composition of the Bundestag: Current vs Historical</h3>
+<div class="cell" data-hash="Visualizing_bundestag_trends_cache/html/clean-for-ggpol_b67506f4a9c85eb5c20b0604a2d4171d">
+
+</div>
+<div class="cell" data-hash="Visualizing_bundestag_trends_cache/html/ggpol-fig1_635eee699bc0b354a15b981123c38daa">
+<div class="cell-output-display">
+<p><img src="Visualizing_bundestag_trends_files/figure-html/ggpol-fig1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell" data-hash="Visualizing_bundestag_trends_cache/html/ggpol-fig2_bbf4f9d25c6689c8142c5676b057b463">
+<div class="cell-output-display">
+<p><img src="Visualizing_bundestag_trends_files/figure-html/ggpol-fig2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>
+</p><p>&nbsp;&nbsp;The first graph shows the composition of the Bundestag after the 2021 election, and the second one, shows what the composition of the Bundestag looks like based on the average number of seats each party has had since the 1949. I think these graphs are not necessarily the most informative, since, for example, we cannot tell what the actual number of seats each party has, and we could use other simpler graphs to convey the information. However, I found this geom a little while ago and I personally think it looks really cool and wanted to show it. Moreover, by putting together the graph for the 2021 election and the seat averages, I think the viewer is able to get a general sense of which parties have dominated parliament and which parties have recently gained more support - specifically, we can see the CDU/CSU and SPD have dominated historically and other center as well as more radical parties have appeared in recent years. Ultimately, this is not the most sound graph, but I think it is visually appealing and I guess we don’t always need to convey life changing insights in a graph. (I should add I am a bit of a politics geek so perhaps these graphs are not as interesting to others, but I digress)</p>
+</section>
+</section>
+<section id="source" class="level2">
+<h2 class="anchored" data-anchor-id="source">Source</h2>
+<p>Data retrieved from Germany’s Federal Returning Officer’s website - <a href="https://www.bundeswahlleiter.de/en/bundeswahlleiter.html">Bundeswahlleiter</a>.</p>
+
+</section>
+</main>
+<!-- /main column -->
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    setTimeout(function() {
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+</body></html>
