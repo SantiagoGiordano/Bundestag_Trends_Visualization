@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-How have seat distributions in the Bundestag evolved since its founding in 1947? Which parties have dominated in which periods? How did the rise of new parties impact other parties? 
+How have seat distributions in the Bundestag evolved since its founding in 1949? Which parties have dominated in which periods? How did the rise of new parties impact other parties? 
 
 ```{r pkgs, warning=FALSE, echo=FALSE, message=FALSE}
 library(pacman)
@@ -32,7 +32,7 @@ bundestag_election_seats <- read_csv(here("Data/bundestag copy.csv"))
 ```
 
 
-## Seat Distribution Since 1947
+## Seat Distribution Since 1949
 ```{r bundestag-fig, echo=FALSE}
 # Wrangle data
 bundestag_2 <- gather(bundestag_party_seats[-c(1),], key = party, value = seats, 

@@ -7,10 +7,10 @@
 <!-- badges: end -->
 
 How have seat distributions in the Bundestag evolved since its founding
-in 1947? Which parties have dominated in which periods? How did the rise
+in 1949? Which parties have dominated in which periods? How did the rise
 of new parties impact other parties?
 
-## Seat Distribution Since 1947
+## Seat Distribution Since 1949
 
 ![](README_files/figure-gfm/bundestag-fig-1.png)<!-- -->
 
