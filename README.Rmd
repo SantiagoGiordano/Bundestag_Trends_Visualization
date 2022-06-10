@@ -1,0 +1,166 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Visualization of Seat Distribution of Parties in the Bundestag
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+How have seat distributions in the Bundestag evolved since its founding in 1947? Which parties have dominated in which periods? How did the rise of new parties impact other parties? 
+
+```{r pkgs, warning=FALSE, echo=FALSE, message=FALSE}
+library(pacman)
+p_load(dplyr, ggplot2, readr, here, tidyr, ggthemes, magrittr, ggpol)
+```
+
+
+```{r data, echo=FALSE, message=FALSE}
+# Load Bundestag data
+bundestag_party_seats <- read_csv("Data/bundestag_party_seats_by_year copy.csv")
+# Load pivotted Bundestag data
+bundestag_election_seats <- read_csv(here("Data/bundestag copy.csv"))
+```
+
+
+## Seat Distribution Since 1947
+```{r bundestag-fig, echo=FALSE}
+# Wrangle data
+bundestag_2 <- gather(bundestag_party_seats[-c(1),], key = party, value = seats, 
+                      c("cdu_csu_seats", "spd_seats", "fdp_seats", "greens_seats", 
+                        "linke_pds_seats", "afd_seats", "other_seats")) 
+
+# Plot data
+ggplot(bundestag_2, aes(x = year, y = seats, group = party, colour = party, shape = party)) + 
+  geom_line() +
+  geom_point() +
+   labs(title = "Historical Seat Distribution in the Bundestag", x = "Year", 
+       y = "Number of Seats", color = "Party", shape = "Party",
+       caption = "Source: https://www.bundeswahlleiter.de/en/bundeswahlleiter.html") +
+  #scale_color_discrete() +
+  scale_color_manual(breaks = c("cdu_csu_seats", "spd_seats", "fdp_seats", "greens_seats", 
+                        "afd_seats", "linke_pds_seats", "other_seats"),
+                     values=c('grey25', 'tomato3', 'gold2', 'springgreen4', 'skyblue1',
+                              'plum', 'grey50'),
+                     labels = c('CDU/CSU', 'SPD', 'FDP', 'Greens', 'Afd', 'Die Linke', 'Other')) +
+  scale_shape_manual(breaks = c("cdu_csu_seats", "spd_seats", "fdp_seats", "greens_seats", 
+                        "afd_seats", "linke_pds_seats", "other_seats"),
+                     values=c(21, 24, 3, 22, 25, 10, 8),
+                     labels = c('CDU/CSU', 'SPD', 'FDP', 'Greens', 'Afd', 'Die Linke', 'Other')) +
+  scale_x_discrete(breaks = c("1949", "1957", "1965", "1972", "1980", "1987", "1994", "2002", "2009", "2017")) +
+  theme_economist() +
+  theme(text = element_text('Avenir Next Condensed'),
+        plot.title = element_text(size = 18),
+        plot.caption = element_text(face = "italic", vjust = -2.5, hjust = 1.4, size = 9),
+        axis.title.y = element_text(vjust = 2.2),
+        axis.title.x = element_text(vjust = -1.8),
+        legend.position = "right",
+        legend.background = element_rect(color = 'black', linetype = 'solid'),
+        legend.box.background = element_rect(fill = "slategray2"),
+        legend.key.size = unit(.5, "cm"),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(
+          size = 9,
+          face = 'italic')
+        )
+```
+
+
+## Comparing Current and Historical Compositions
+
+```{r clean-for-ggpol-fig, echo = FALSE}
+# A) Some cleaning:
+  # Rename column
+bundestag_election_seats <- rename(bundestag_election_seats, "seats_2021" = "2021")
+  # Rearrange rows:
+bundestag_election_seats %<>% 
+  arrange(factor(Party, 
+                 levels = c("Other", "Afd", "CDU/CSU", "FDP", 
+                            "Grüne", "SPD", "Die Linke (PDS)")))
+```
+
+### Current composition
+
+```{r ggpol-fig1, echo=FALSE}
+# B) Plot:
+  # b.1) Plot graph of Bundestag after 2021 election
+ggplot(bundestag_election_seats[-c(8:10),]) + 
+  geom_parliament(aes(seats = seats_2021, fill = Party), color = "black") +
+  labs(
+    title = "German Bundestag After 2021 Election",
+    caption = "Source: https://www.bundeswahlleiter.de/en/bundeswahlleiter.html") +
+  scale_fill_manual(name = "Party", 
+                    values = c("grey", "skyblue1", "grey25", "gold2",  
+                               "springgreen4", "tomato3","plum"), 
+                    labels = c("Other", "AfD", "CDU/CSU", "FDP", "Greens", "SPD", "Die Linke")) + 
+  theme_void() +
+  theme_economist() +
+  theme(
+    text = element_text('Avenir Next Condensed'),
+    plot.title = element_text(face = 'bold', size = 25),
+    #plot.margin = unit(c(1, 1, 1, 1), "cm"),
+    plot.subtitle = element_text(size = 15, vjust = -0.6),
+    legend.position = "right",
+    legend.key.size = unit(c(0.55), "cm"),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 8),
+    legend.box.background = element_rect(fill = "slategray2"), #lightsteelblue2 slategray2
+    legend.box.margin = margin(5,5,5,5),
+    plot.caption = element_text(face = 'italic', vjust = -0.5, size = 9, hjust = 1),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+```
+
+### Historical composition
+
+```{r ggpol-fig2, echo=FALSE}
+  # b.2) Plot graph of avg seat distribution in the Bundestag
+ggplot(bundestag_election_seats[-c(8:10),]) + 
+  geom_parliament(aes(seats = avg_seats, fill = Party), color = "black") +
+  labs(
+    title = "Average Seat Distribution in the Bundestag",
+    subtitle = "(Since 1949)",
+    caption = "Source: https://www.bundeswahlleiter.de/en/bundeswahlleiter.html") +
+  scale_fill_manual(name = "Party", 
+                    values = c("grey", "skyblue1", "grey25", "gold2",  
+                               "springgreen4", "tomato3","plum"), 
+                    labels = c("Other", "AfD", "CDU/CSU", "FDP", "Greens", "SPD", "Die Linke")) + #bundestag_election_seats$Party
+  theme_void() +
+  theme_economist() +
+  theme(
+    text = element_text('Avenir Next Condensed'),
+    plot.title = element_text(face = 'bold', size = 25),
+    #plot.margin = unit(c(1, 1, 1, 1), "cm"),
+    plot.subtitle = element_text(size = 15, vjust = -0.6),
+    legend.position = "right",
+    legend.key.size = unit(c(0.55), "cm"),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 8),
+    legend.box.background = element_rect(fill = "slategray2"), #lightsteelblue2 slategray2
+    legend.box.margin = margin(5,5,5,5),
+    plot.caption = element_text(face = 'italic', vjust = -0.5, size = 9, hjust = 1),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+```
+
+
+
+## Source
+
+Data retrieved from Germany's Federal Returning Officer's website - [Bundeswahlleiter](https://www.bundeswahlleiter.de/en/bundeswahlleiter.html). 
